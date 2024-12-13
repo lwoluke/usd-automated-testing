@@ -1,0 +1,8 @@
+# Ignore Visual Studio Code files
+/.vscode/
+
+# Ignore usd folder
+/usd/
+
+# Ignore the build folder
+/build/
