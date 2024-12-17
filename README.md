@@ -11,7 +11,7 @@ This program is built using Pixar's Universal Scene Description (USD) libraries,
 ---
 
 ## Prerequisites
-Before building and running this project, ensure you have the following:
+Before building or using a prebuilt binary and then running this project, ensure you have the following:
 
 ### Required Tools
 - A C++ compiler (e.g., GCC, Clang, MSVC)
@@ -28,8 +28,12 @@ git clone https://github.com/lwoluke/automated-usd-testing.git
 cd automated-usd-testing
 ```
 
-### Step 2: Create USD build
-Follow the [official USD build instructions](https://github.com/PixarAnimationStudios/OpenUSD/tree/release?tab=readme-ov-file#getting-and-building-the-code) to set up the USD libraries. Make sure to build into your usd directory.
+### Step 2: Create USD build or Download Prebuilt Binary
+Choice #1: Follow the [official USD build instructions](https://github.com/PixarAnimationStudios/OpenUSD/tree/release?tab=readme-ov-file#getting-and-building-the-code) to set up the USD libraries.
+
+Choice #2: Visit the [Nvidia Pre-Built OpenUSD Download](https://developer.nvidia.com/usd) section to install the USD libraries.
+
+Make sure the USD libraries are either built or downloaded, and then placed into the `usd` directory within the project.
 
 ### Step 3: Build the Project
 Navigate to the build directory and compile the project:
@@ -80,7 +84,7 @@ Ideas include:
 ---
 
 ## Contributing
-Contributions are welcome! Feel free to submit issues or pull requests to enhance the functionality.
+Contributions are welcome! Feel free to submit issues or pull requests to enhance the functionality. When contributing, ensure you follow the project's coding style. Submit PRs with detailed descriptions of changes.
 
 ## Acknowledgments
 - [Pixar Universal Scene Description](https://github.com/PixarAnimationStudios/USD)
