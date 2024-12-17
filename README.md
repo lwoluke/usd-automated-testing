@@ -33,7 +33,7 @@ Choice #1: Follow the [official USD build instructions](https://github.com/Pixar
 
 Choice #2: Visit the [Nvidia Pre-Built OpenUSD Download](https://developer.nvidia.com/usd) section to install the USD libraries.
 
-Make sure the USD libraries are either built or downloaded and placed into the `usd` directory within the project.
+Make sure the USD libraries are either built or downloaded, and then placed into the `usd` directory within the project.
 
 ### Step 3: Build the Project
 Navigate to the build directory and compile the project:
