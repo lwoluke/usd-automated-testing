@@ -1,0 +1,22 @@
+name: Trigger Jenkins Build
+
+on:
+  push:
+    branches:
+      - dev
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  trigger-jenkins:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Jenkins Job
+        uses: appleboy/jenkins-action@v1.0.0
+        with:
+          url: "https://polite-master-sawfish.ngrok-free.app" # Ngrok URL
+          user: "luke"                                       # Jenkins username
+          token: ${{ secrets.JENKINS_API_TOKEN }}             # Use GitHub secret for security
+          job: "USD-Validation-Pipeline"                     # Jenkins job name
