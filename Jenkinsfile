@@ -1,6 +1,6 @@
 pipeline {
     parameters {
-        choice(name: 'AGENT', choices: ['linux', 'windows'], description: 'Choose the agent to run the pipeline')
+        choice(name: 'AGENT', choices: ['linux', 'windows'], description: 'Choose the build agent to run the Jenkins pipeline')
     }
     agent { label "${params.AGENT}" }
     environment {
@@ -17,7 +17,7 @@ pipeline {
                         sh "${PYTHON_HOME} --version"
                         echo "USD_HOME is set to ${USD_HOME}"
                     } else if (params.AGENT == 'windows') {
-                        bat "%CMAKE_HOME% --version"
+                        bat "\"%CMAKE_HOME%\" --version"
                         bat "%PYTHON_HOME% --version"
                         echo "USD_HOME is set to %USD_HOME%"
                     }
