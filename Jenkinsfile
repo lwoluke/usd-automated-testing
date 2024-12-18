@@ -1,6 +1,6 @@
 pipeline {
     parameters {
-        choice(name: 'AGENT', choices: ['linux', 'windows'], description: 'Choose the build agent to run the pipeline')
+        choice(name: 'AGENT', choices: ['linux', 'windows'], description: 'Choose the build agent to run the Jenkins pipeline')
     }
     agent { label "${params.AGENT}" }
     environment {
