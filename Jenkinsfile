@@ -1,6 +1,6 @@
 pipeline {
     parameters {
-        choice(name: 'AGENT', choices: ['linux', 'windows'], description: 'Choose the agent to run the pipeline', defaultValue: 'linux')
+        choice(name: 'AGENT', choices: ['linux', 'windows'], description: 'Choose the build agent to run the pipeline', defaultValue: 'linux')
     }
     agent { label "${['linux', 'windows'].contains(params.AGENT) ? params.AGENT : 'linux'}" }
     environment {
