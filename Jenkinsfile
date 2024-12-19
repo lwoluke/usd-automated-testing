@@ -16,11 +16,23 @@ pipeline {
         stage('Determine Branch and Agent') {
             steps {
                 script {
+                    echo "Parameters:"
+                    echo "  AGENT: ${params.AGENT}"
+                    echo "Environment:"
+                    echo "  NODE_NAME: ${env.NODE_NAME}"
+
                     def actualBranch = params.BRANCH_NAME ?: env.BRANCH_NAME
                     if (!actualBranch) {
                         error "Branch name could not be determined. Ensure the pipeline is triggered by a GitHub webhook or provide a BRANCH_NAME parameter."
                     }
-                    def actualAgent = params.AGENT ?: env.NODE_NAME
+
+                    def actualAgent = params.AGENT?.toLowerCase()?.trim() ?: env.NODE_NAME?.toLowerCase()?.trim()
+                    echo "  Resolved Agent: ${actualAgent}"
+
+                    if (!actualAgent || (actualAgent != 'linux' && actualAgent != 'windows')) {
+                        error "Unknown or misconfigured agent: ${actualAgent}"
+                    }
+
                     echo "Building branch: ${actualBranch}"
                     echo "Running on agent: ${actualAgent}"
                 }
