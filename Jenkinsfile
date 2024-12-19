@@ -1,16 +1,20 @@
 pipeline {
     parameters {
-        choice(name: 'AGENT', choices: ['linux', 'windows'], description: 'Choose the build agent (linux or windows)')
-        string(name: 'BRANCH_NAME', defaultValue: '', description: 'Branch to build (leave blank for detected branch)')
+        choice(name: 'AGENT', 
+               choices: ['linux_agent', 'windows_agent'], 
+               description: 'Choose the build agent (linux_agent or windows_agent)')
+        string(name: 'BRANCH_NAME', 
+               defaultValue: '', 
+               description: 'Branch to build (leave blank for detected branch)')
     }
     agent { 
-        label "${params.AGENT?.toLowerCase()?.trim() ?: env.NODE_NAME?.toLowerCase()?.trim()}" 
+        label "${params.AGENT}"
     }
     environment {
-        CMAKE_HOME = "${env.NODE_NAME?.trim()?.toLowerCase() == 'windows' ? 'C:\\Program Files\\CMake\\bin\\cmake.exe' : '/usr/bin/cmake'}"
-        PYTHON_HOME = "${env.NODE_NAME?.trim()?.toLowerCase() == 'windows' ? 'C:\\Users\\lwolu\\AppData\\Local\\Programs\\Python\\Python310' : '/usr/bin/python3'}"
-        USD_HOME = "${env.NODE_NAME?.trim()?.toLowerCase() == 'windows' ? 'C:\\Users\\lwolu\\OneDrive\\Documents\\Coding\\dev\\usd-automated-testing\\usd' : '/mnt/c/Users/lwolu/OneDrive/Documents/Coding/dev/usd-automated-testing/usd'}"
-        GIT_HOME = "${env.NODE_NAME?.trim()?.toLowerCase() == 'windows' ? 'C:\\Program Files\\Git\\bin\\git.exe' : '/usr/bin/git'}"
+        CMAKE_HOME = "${params.AGENT == 'windows_agent' ? 'C:\\Program Files\\CMake\\bin\\cmake.exe' : '/usr/bin/cmake'}"
+        PYTHON_HOME = "${params.AGENT == 'windows_agent' ? 'C:\\Users\\lwolu\\AppData\\Local\\Programs\\Python\\Python310' : '/usr/bin/python3'}"
+        USD_HOME = "${params.AGENT == 'windows_agent' ? 'C:\\Users\\lwolu\\OneDrive\\Documents\\Coding\\dev\\usd-automated-testing\\usd' : '/mnt/c/Users/lwolu/OneDrive/Documents/Coding/dev/usd-automated-testing/usd'}"
+        GIT_HOME = "${params.AGENT == 'windows_agent' ? 'C:\\Program Files\\Git\\bin\\git.exe' : '/usr/bin/git'}"
     }
     stages {
         stage('Determine Branch and Agent') {
@@ -20,21 +24,19 @@ pipeline {
                     echo "  AGENT: ${params.AGENT}"
                     echo "Environment:"
                     echo "  NODE_NAME: ${env.NODE_NAME}"
+                    echo "Resolved Agent: ${params.AGENT}"
+
+                    if (params.AGENT != 'linux_agent' && params.AGENT != 'windows_agent') {
+                        error "Unknown or misconfigured agent: ${params.AGENT}"
+                    }
+
+                    echo "Running on agent: ${params.AGENT}"
 
                     def actualBranch = params.BRANCH_NAME ?: env.BRANCH_NAME
                     if (!actualBranch) {
                         error "Branch name could not be determined. Ensure the pipeline is triggered by a GitHub webhook or provide a BRANCH_NAME parameter."
                     }
-
-                    def actualAgent = params.AGENT?.toLowerCase()?.trim() ?: env.NODE_NAME?.toLowerCase()?.trim()
-                    echo "  Resolved Agent: ${actualAgent}"
-
-                    if (!actualAgent || (actualAgent != 'linux' && actualAgent != 'windows')) {
-                        error "Unknown or misconfigured agent: ${actualAgent}"
-                    }
-
                     echo "Building branch: ${actualBranch}"
-                    echo "Running on agent: ${actualAgent}"
                 }
             }
         }
@@ -48,24 +50,28 @@ pipeline {
                 }
             }
         }
+        stage('Debug PATH') {
+            steps {
+                bat 'echo %PATH%'
+            }
+        }
         stage('Check Tools') {
             steps {
                 script {
-                    def normalizedNodeName = env.NODE_NAME?.trim()?.toLowerCase()
-                    if (normalizedNodeName == 'windows') {
+                    if (params.AGENT == 'windows_agent') {
                         echo "Running on Windows"
                         bat "\"${CMAKE_HOME}\" --version"
                         bat "\"${PYTHON_HOME}\\python.exe\" --version"
                         bat "\"${GIT_HOME}\" --version"
                         echo "USD_HOME is set to ${USD_HOME}"
-                    } else if (normalizedNodeName == 'linux') {
+                    } else if (params.AGENT == 'linux_agent') {
                         echo "Running on Linux"
                         sh "${CMAKE_HOME} --version"
                         sh "${PYTHON_HOME} --version"
                         sh "${GIT_HOME} --version"
                         echo "USD_HOME is set to ${USD_HOME}"
                     } else {
-                        error "Unknown agent: ${env.NODE_NAME}"
+                        error "Unknown agent: ${params.AGENT}"
                     }
                 }
             }
