@@ -2,8 +2,7 @@ pipeline {
     parameters {
         choice(name: 'AGENT', 
                choices: ['linux_agent', 'windows_agent'], 
-               description: 'Choose the build agent (linux_agent or windows_agent)', 
-               defaultValue: 'linux_agent')
+               description: 'Choose the build agent (linux_agent or windows_agent)')
         string(name: 'BRANCH_NAME', 
                defaultValue: '', 
                description: 'Branch to build (leave blank for detected branch)')
