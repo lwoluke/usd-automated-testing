@@ -40,6 +40,22 @@ pipeline {
                 }
             }
         }
+
+        stage('Set OS-specific Environment') {
+            steps {
+                script {
+                    if (params.AGENT == 'windows_agent') {
+                        // Explicitly set Windows-specific environment variables
+                        env.COMSPEC = "C:\\Windows\\System32\\cmd.exe"
+                        env.PATH = "C:\\Windows\\System32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0"
+                    } else {
+                        // Linux-specific environment adjustments (if needed)
+                        env.PATH = "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+                    }
+                }
+            }
+        }
+
         stage('Checkout') {
             steps {
                 script {
@@ -50,11 +66,28 @@ pipeline {
                 }
             }
         }
+
         stage('Debug PATH') {
+            when {
+                expression { return params.AGENT == 'windows_agent' }
+            }
             steps {
+                // This should run `bat` only if on Windows
                 bat 'echo %PATH%'
             }
         }
+
+        stage('Debug Env') {
+            when {
+                expression { return params.AGENT == 'windows_agent' }
+            }
+            steps {
+                // Test if `bat` works at all on Windows
+                bat 'echo %COMSPEC%'
+                bat 'set'
+            }
+        }
+
         stage('Check Tools') {
             steps {
                 script {
@@ -76,6 +109,7 @@ pipeline {
                 }
             }
         }
+
         stage('Verify Environment') {
             steps {
                 script {
