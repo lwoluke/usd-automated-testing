@@ -22,6 +22,13 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
 include_directories(${Python3_INCLUDE_DIRS})
 link_directories(${Python3_LIBRARY_DIRS})
 
+# Suppress warnings
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    add_compile_options(-Wno-deprecated -Wno-pragmas)
+elseif (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    add_compile_options(-Wno-deprecated-declarations)
+endif()
+
 # Add the main executable
 add_executable(usdTestRunner src/main.cpp)
 
