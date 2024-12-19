@@ -16,25 +16,35 @@ pipeline {
         stage('Determine Branch and Agent') {
             steps {
                 script {
+                    // Log parameters and environment variables
                     echo "Parameters:"
                     echo "  AGENT: ${params.AGENT}"
                     echo "Environment:"
                     echo "  NODE_NAME: ${env.NODE_NAME}"
 
+                    // Normalize the agent label
+                    def actualAgent = params.AGENT?.toLowerCase()?.trim() ?: env.NODE_NAME?.toLowerCase()?.trim()
+                    echo "  Resolved Agent: ${actualAgent}"
+
+                    // Validate the resolved agent label against expected values
+                    if (actualAgent == 'linux_agent') {
+                        actualAgent = 'linux'
+                    } else if (actualAgent == 'windows_agent') {
+                        actualAgent = 'windows'
+                    }
+
+                    if (actualAgent != 'linux' && actualAgent != 'windows') {
+                        error "Unknown or misconfigured agent: ${actualAgent}"
+                    }
+
+                    echo "Running on agent: ${actualAgent}"
+
+                    // Determine the branch
                     def actualBranch = params.BRANCH_NAME ?: env.BRANCH_NAME
                     if (!actualBranch) {
                         error "Branch name could not be determined. Ensure the pipeline is triggered by a GitHub webhook or provide a BRANCH_NAME parameter."
                     }
-
-                    def actualAgent = params.AGENT?.toLowerCase()?.trim() ?: env.NODE_NAME?.toLowerCase()?.trim()
-                    echo "  Resolved Agent: ${actualAgent}"
-
-                    if (!actualAgent || (actualAgent != 'linux' && actualAgent != 'windows')) {
-                        error "Unknown or misconfigured agent: ${actualAgent}"
-                    }
-
                     echo "Building branch: ${actualBranch}"
-                    echo "Running on agent: ${actualAgent}"
                 }
             }
         }
