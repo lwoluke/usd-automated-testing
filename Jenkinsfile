@@ -8,8 +8,8 @@ pipeline {
     }
     environment {
         CMAKE_HOME = "${env.NODE_NAME == 'windows' ? 'C:\\Program Files\\CMake\\bin\\cmake.exe' : '/usr/bin/cmake'}"
-        PYTHON_HOME = "${env.NODE_NAME == 'windows' ? 'C:\\Python39' : '/usr/bin/python3'}"
-        USD_HOME = "${env.NODE_NAME == 'windows' ? 'C:\\USD' : '/usr/local/usd'}"
+        PYTHON_HOME = "${env.NODE_NAME == 'windows' ? 'C:\\Users\\lwolu\\AppData\\Local\\Programs\\Python\\Python310' : '/usr/bin/python3'}"
+        USD_HOME = "${env.NODE_NAME == 'windows' ? 'C:\\Users\\lwolu\\OneDrive\\Documents\\Coding\\dev\\usd-automated-testing\\usd' : '/mnt/c/Users/lwolu/OneDrive/Documents/Coding/dev/usd-automated-testing/usd'}"
     }
     stages {
         stage('Determine Branch and Agent') {
