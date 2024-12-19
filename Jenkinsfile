@@ -1,7 +1,7 @@
 pipeline {
     parameters {
         choice(name: 'AGENT', choices: ['linux', 'windows'], description: 'Choose the build agent (linux or windows)')
-        string(name: 'BRANCH_NAME', defaultValue: '', description: 'Branch to build from (leave blank for detected branch)')
+        string(name: 'BRANCH_NAME', defaultValue: '', description: 'Branch to build (leave blank for detected branch)')
     }
     agent { 
         label "${params.AGENT ?: env.NODE_NAME}" 
