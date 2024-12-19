@@ -1,16 +1,21 @@
 pipeline {
     parameters {
-        choice(name: 'AGENT', choices: ['linux_agent', 'windows_agent'], description: 'Choose the build agent (linux_agent or windows_agent)')
-        string(name: 'BRANCH_NAME', defaultValue: '', description: 'Branch to build (leave blank for detected branch)')
+        choice(name: 'AGENT', 
+               choices: ['linux_agent', 'windows_agent'], 
+               description: 'Choose the build agent (linux_agent or windows_agent)', 
+               defaultValue: 'linux_agent')
+        string(name: 'BRANCH_NAME', 
+               defaultValue: '', 
+               description: 'Branch to build (leave blank for detected branch)')
     }
     agent { 
-        label "${params.AGENT ?: env.NODE_NAME}" 
+        label "${params.AGENT}"
     }
     environment {
-        CMAKE_HOME = "${env.NODE_NAME == 'windows_agent' ? 'C:\\Program Files\\CMake\\bin\\cmake.exe' : '/usr/bin/cmake'}"
-        PYTHON_HOME = "${env.NODE_NAME == 'windows_agent' ? 'C:\\Users\\lwolu\\AppData\\Local\\Programs\\Python\\Python310' : '/usr/bin/python3'}"
-        USD_HOME = "${env.NODE_NAME == 'windows_agent' ? 'C:\\Users\\lwolu\\OneDrive\\Documents\\Coding\\dev\\usd-automated-testing\\usd' : '/mnt/c/Users/lwolu/OneDrive/Documents/Coding/dev/usd-automated-testing/usd'}"
-        GIT_HOME = "${env.NODE_NAME == 'windows_agent' ? 'C:\\Program Files\\Git\\bin\\git.exe' : '/usr/bin/git'}"
+        CMAKE_HOME = "${params.AGENT == 'windows_agent' ? 'C:\\Program Files\\CMake\\bin\\cmake.exe' : '/usr/bin/cmake'}"
+        PYTHON_HOME = "${params.AGENT == 'windows_agent' ? 'C:\\Users\\lwolu\\AppData\\Local\\Programs\\Python\\Python310' : '/usr/bin/python3'}"
+        USD_HOME = "${params.AGENT == 'windows_agent' ? 'C:\\Users\\lwolu\\OneDrive\\Documents\\Coding\\dev\\usd-automated-testing\\usd' : '/mnt/c/Users/lwolu/OneDrive/Documents/Coding/dev/usd-automated-testing/usd'}"
+        GIT_HOME = "${params.AGENT == 'windows_agent' ? 'C:\\Program Files\\Git\\bin\\git.exe' : '/usr/bin/git'}"
     }
     stages {
         stage('Determine Branch and Agent') {
@@ -20,14 +25,13 @@ pipeline {
                     echo "  AGENT: ${params.AGENT}"
                     echo "Environment:"
                     echo "  NODE_NAME: ${env.NODE_NAME}"
-                    def actualAgent = params.AGENT ?: env.NODE_NAME
-                    echo "Resolved Agent: ${actualAgent}"
+                    echo "Resolved Agent: ${params.AGENT}"
 
-                    if (actualAgent != 'linux_agent' && actualAgent != 'windows_agent') {
-                        error "Unknown or misconfigured agent: ${actualAgent}"
+                    if (params.AGENT != 'linux_agent' && params.AGENT != 'windows_agent') {
+                        error "Unknown or misconfigured agent: ${params.AGENT}"
                     }
 
-                    echo "Running on agent: ${actualAgent}"
+                    echo "Running on agent: ${params.AGENT}"
 
                     def actualBranch = params.BRANCH_NAME ?: env.BRANCH_NAME
                     if (!actualBranch) {
@@ -50,20 +54,20 @@ pipeline {
         stage('Check Tools') {
             steps {
                 script {
-                    if (env.NODE_NAME == 'windows_agent') {
+                    if (params.AGENT == 'windows_agent') {
                         echo "Running on Windows"
                         bat "\"${CMAKE_HOME}\" --version"
                         bat "\"${PYTHON_HOME}\\python.exe\" --version"
                         bat "\"${GIT_HOME}\" --version"
                         echo "USD_HOME is set to ${USD_HOME}"
-                    } else if (env.NODE_NAME == 'linux_agent') {
+                    } else if (params.AGENT == 'linux_agent') {
                         echo "Running on Linux"
                         sh "${CMAKE_HOME} --version"
                         sh "${PYTHON_HOME} --version"
                         sh "${GIT_HOME} --version"
                         echo "USD_HOME is set to ${USD_HOME}"
                     } else {
-                        error "Unknown agent: ${env.NODE_NAME}"
+                        error "Unknown agent: ${params.AGENT}"
                     }
                 }
             }
