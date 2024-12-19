@@ -50,6 +50,11 @@ pipeline {
                 }
             }
         }
+        stage('Debug PATH') {
+            steps {
+                bat 'echo %PATH%'
+            }
+        }
         stage('Check Tools') {
             steps {
                 script {
