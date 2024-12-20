@@ -59,7 +59,6 @@ Use the following command to run the test runner:
 
 ### Example Output
 ```
-Running tests on: /automated-usd-testing/test/all_pass.usda
 Opened USD file Successfully.
 
 [PASS] Validate Geometry: All geometry prims are valid.
