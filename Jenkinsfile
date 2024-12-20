@@ -52,7 +52,6 @@ pipeline {
             steps {
                 script {
                     if (params.AGENT == 'windows_agent') {
-                        // Explicitly set Windows-specific environment variables
                         env.COMSPEC = "C:\\Windows\\System32\\cmd.exe"
                         env.PATH = "C:\\Windows\\System32;C:\\Windows;C:\\Windows\\System32\\Wbem;C:\\Windows\\System32\\WindowsPowerShell\\v1.0"
                     }
@@ -134,22 +133,16 @@ pipeline {
             }
         }
 
-        stage('Check USD Headers') {
-            steps {
-                sh 'ls -l usd/include/pxr/usd/usd/stage.h'
-            }
-        }
-
         stage('Build') {
             steps {
                 script {
                     if (params.AGENT == 'windows_agent') {
                         // Windows build steps
-                        bat "\"${CMAKE_HOME}\" -S . -B build"
+                        bat "\"${CMAKE_HOME}\" -S . -B build -DUSD_ROOT=%USD_HOME%"
                         bat "\"${CMAKE_HOME}\" --build build --config Release"
                     } else {
                         // Linux build steps
-                        sh 'mkdir -p build && cd build && cmake .. && make -j$(nproc)'
+                        sh "mkdir -p build && cd build && ${CMAKE_HOME} -DUSD_ROOT=${env.USD_HOME} .. && make -j\$(nproc)"
                     }
                 }
             }
@@ -159,7 +152,6 @@ pipeline {
             steps {
                 script {
                     // Run tests on each USD file and store the results
-                    // On Windows, use `bat` with proper escaping; on Linux, use `sh`
                     def testCommands = ""
                     TEST_FILES.split(' ').each { file ->
                         def testFilePath = "test/${file}"
@@ -172,7 +164,6 @@ pipeline {
                     }
 
                     if (params.AGENT == 'windows_agent') {
-                        // On Windows, write a temporary batch file for the test commands
                         writeFile file: 'run_tests.bat', text: testCommands
                         bat 'run_tests.bat'
                     } else {

@@ -5,8 +5,12 @@ project(AutomatedUSDTesting CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Point to the USD prebuilt directory
-set(USD_ROOT "${CMAKE_SOURCE_DIR}/usd")
+# If USD_ROOT is not defined, default to /usr/local/USD
+if(NOT DEFINED USD_ROOT)
+    set(USD_ROOT "/usr/local/USD")
+endif()
+
+message("Using USD_ROOT=${USD_ROOT}")
 
 # Include directories for USD
 include_directories("${USD_ROOT}/include")
