@@ -79,7 +79,6 @@ public:
      */
     void runTests() {
         pxr::UsdStageRefPtr stage = pxr::UsdStage::Open(usdFilePath);
-        std::cout << "Running tests on: " << usdFilePath << "\n";
         if (!stage) {
             std::cerr << "Failed to open USD file. Ensure the file path is correct and the file is accessible.\n\n";
             return;
@@ -128,11 +127,11 @@ private:
         std::cout << "  Failed: " << failed << "\n";
 
         if (failed > 0 && passed > 0) {
-            std::cout << "\nSome tests failed. Please review the USD file and address the failing tests.\n";
+            std::cout << "\nSome tests failed. Please review the USD file and address the failing tests.\n\n";
         } else if (failed > 0) {
-            std::cout << "\nAll tests failed. The USD file may have serious issues. Please review it thoroughly.\n";
+            std::cout << "\nAll tests failed. The USD file may have serious issues. Please review it thoroughly.\n\n";
         } else {
-            std::cout << "\nCongratulations, all tests were successful!\n";
+            std::cout << "\nCongratulations, all tests were successful!\n\n";
         }
     }
 };
