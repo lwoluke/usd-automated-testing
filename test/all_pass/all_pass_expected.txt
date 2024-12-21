@@ -1,0 +1,11 @@
+Opened USD file Successfully.
+
+[PASS] Validate Geometry: All geometry prims are valid.
+[PASS] Validate Shaders: All shaders in the scene are valid.
+[PASS] Validate Layer Structure: Layer stack is valid.
+
+Summary:
+  Passed: 3
+  Failed: 0
+
+Congratulations, all tests were successful!
