@@ -62,7 +62,7 @@ While I have configured Jenkins locally for my setup, you'll need to set up your
    To make your local Jenkins server accessible, use ngrok:
 
    ```bash
-   ngrok http --url=[your-generated-url].ngrok-free.app 8080
+   ngrok http --url=<your-ngrok-url> 8080
    ```
    To access your free static url, go to the [Ngrok Setup Page](https://dashboard.ngrok.com/get-started/setup/windows)
 
