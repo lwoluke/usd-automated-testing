@@ -19,24 +19,20 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Prevent Windows.h from defining min/max macros that could conflict with std::min/std::max
 add_definitions(-DNOMINMAX)
 
-# Set default USD installation directory based on platform
-# Can be overridden with -DUSD_ROOT=/path/to/usd during cmake configuration
-if(NOT DEFINED USD_ROOT)
+# Set USD installation directory as a cache variable with type and description
+set(USD_ROOT "" CACHE PATH "Path to USD installation directory")
+
+# Set default USD installation directory if not provided
+if(USD_ROOT STREQUAL "")
     if(WIN32)
-        set(USD_ROOT "C:/Users/lwolu/OneDrive/Documents/Coding/dev/usd-automated-testing/usd") # Default Windows path
+        set(USD_ROOT "C:/Users/lwolu/OneDrive/Documents/Coding/dev/usd-automated-testing/usd" CACHE PATH "Default Windows USD path" FORCE)
     else()
-        set(USD_ROOT "/usr/local/USD") # Default Linux path
+        set(USD_ROOT "/usr/local/USD" CACHE PATH "Default Linux USD path" FORCE)
     endif()
 endif()
 
 # Display the USD installation path being used
 message("Using USD_ROOT=${USD_ROOT}")
-
-# Add USD header files to include path
-include_directories("${USD_ROOT}/include")
-
-# Add USD library directory to linker search path
-link_directories("${USD_ROOT}/lib")
 
 # Automatically detect USD libraries based on platform
 if(WIN32)
@@ -48,10 +44,8 @@ else()
 endif()
 
 # Configure Python dependencies
-# Requires Python 3 with development components
-find_package(Python3 REQUIRED COMPONENTS Interpreter Development)
-include_directories(${Python3_INCLUDE_DIRS})
-link_directories(${Python3_LIBRARY_DIRS})
+# Using only Development component as we don't need the interpreter
+find_package(Python COMPONENTS Development)
 
 # Configure compiler-specific warning suppressions
 if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -65,8 +59,9 @@ endif()
 # Define the main executable target
 add_executable(usdTestRunner src/main.cpp)
 
-# Link the executable with USD and Python libraries
-target_link_libraries(usdTestRunner ${USD_LIBS} ${Python3_LIBRARIES})
+# Configure target-specific include directories and library dependencies
+target_include_directories(usdTestRunner PRIVATE "${USD_ROOT}/include")
+target_link_libraries(usdTestRunner PRIVATE ${USD_LIBS} Python::Python)
 
 # Configure runtime library search path (RPATH) for Linux systems
 # This ensures the executable can find USD libraries at runtime
