@@ -63,6 +63,9 @@ add_executable(usdTestRunner src/main.cpp)
 target_include_directories(usdTestRunner PRIVATE "${USD_ROOT}/include")
 target_link_libraries(usdTestRunner PRIVATE ${USD_LIBS} Python::Python)
 
+# Add the project's include directory
+target_include_directories(usdTestRunner PRIVATE "${CMAKE_SOURCE_DIR}/include")
+
 # Configure runtime library search path (RPATH) for Linux systems
 # This ensures the executable can find USD libraries at runtime
 if(NOT WIN32)

@@ -5,13 +5,14 @@ USD Automated Testing is a command-line utility for validating USD files. This t
 - Geometry (usdGeom)
 - Shaders (usdShade)
 - Layer structure
+- Variants
 
 This program is built using Pixar's Universal Scene Description (USD) libraries, making it ideal for workflows in animation, VFX, and gaming pipelines.
 
 ---
 
 ## Prerequisites
-Before building or using a prebuilt binary and then running this project, ensure you have the following:
+Before building or using a prebuilt binary, and then running this project, ensure you have the following:
 
 ### Required Tools
 - A C++ compiler (e.g., GCC, Clang, MSVC)
@@ -90,9 +91,31 @@ java -jar agent.jar -url <your-ngrok-url> -secret @secret-file -name "windows_ag
 The usdTestRunner utility validates USD files by checking for essential components like geometry and shaders.
 
 ### Running the Test Runner
-Use the following command to run the test runner:
+Examples of commands to run the test runner:
 ```
-./usdTestRunner path/to/usdfile.usda
+# Run all tests (default behavior)
+./usdTestRunner path/to/file.usda
+
+# Run only geometry validation
+./usdTestRunner path/to/file.usda -only-geometry
+
+# Skip shader validation
+./usdTestRunner path/to/file.usda -skip-shaders
+
+# Skip multiple tests
+./usdTestRunner path/to/file.usda -skip-geometry -skip-shaders
+
+# To see a full list of commands, run:
+./usdTestRunner -help
+
+# Run tests and save results to a file
+./usdTestRunner path/to/file.usda -output results.txt
+
+# Run specific tests and save results
+./usdTestRunner path/to/file.usda -only-geometry -output geometry_results.txt
+
+# Skip tests and save results
+./usdTestRunner path/to/file.usda -skip-shaders -output validation_results.txt
 ```
 
 ---
@@ -101,25 +124,18 @@ Use the following command to run the test runner:
 ```
 Opened USD file Successfully.
 
-[PASS] Validate Geometry: All geometry prims are valid.
-[PASS] Validate Shader: All shaders in the scene are valid.
-[PASS] Validate Layer Structure: Layer stack is valid.
+[PASS] Validate Geometry: No geometry found in the scene, but that's not required.
+[PASS] Validate Shaders: No shaders found in the scene, but that's acceptable.
+[PASS] Validate Layer Structure: Layer stack and all references are valid.
+[PASS] Validate Variants: No variants found in the scene. That's acceptable.
 
 Summary:
-  Passed: 3
+  Passed: 4
   Failed: 0
 
 Congratulations, all tests were successful!
+
 ```
----
-
-## Future Development Ideas
-Ideas include:
-- Allow users to run specific tests (e.g., --only-geometry, --skip-shaders) for greater flexibility.
-- Save validation results to a text or JSON file for easier sharing and review.
-- Expand to support additional evaluation types, such as asset hierarchy validation or custom plugin integrations.
-- Add more test files to handle edge cases, ensuring robustness against unusual or invalid USD configurations.
-
 ---
 
 ## Contributing
@@ -133,4 +149,4 @@ Contributions are welcome! Feel free to submit issues or pull requests to enhanc
 ---
 
 ## Learn More
-If you're interested in learning more about the development of USD Automated Testing, including tips and challenges faced during implementation, check out this [project part 1 blog post](https://luke-o.medium.com/c-automated-testing-framework-for-pixars-usd-50af70e58563) and this [project part 2 blog post](https://luke-o.medium.com/extending-usd-automated-testing-with-jenkins-integration-002dcdec3786).
+If you're interested in learning more about the development of USD Automated Testing, including tips and challenges faced during implementation, check out this [project part 1 blog post](https://luke-o.medium.com/c-automated-testing-framework-for-pixars-usd-50af70e58563), this [project part 2 blog post](https://luke-o.medium.com/extending-usd-automated-testing-with-jenkins-integration-002dcdec3786), and this [project part 3 blog post](https://luke-o.medium.com/usd-automated-testing-tool-functionality-expansion-33d23e06ea34).
