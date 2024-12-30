@@ -19,7 +19,7 @@ jobs:
       - name: Trigger Jenkins Job
         uses: appleboy/jenkins-action@v1.0.0
         with:
-          url: "https://polite-master-sawfish.ngrok-free.app" # Ngrok URL
-          user: "luke"                                       # Jenkins username
-          token: ${{ secrets.JENKINS_API_TOKEN }}             # Use GitHub secret for security
-          job: "USD-Validation-Pipeline"                     # Jenkins job name
+          url: ${{ secrets.NGROK_URL }}             # Ngrok URL
+          user: "luke"                             # Jenkins username
+          token: ${{ secrets.JENKINS_API_TOKEN }}  # Use GitHub secret for security
+          job: "USD-Validation-Pipeline"           # Jenkins job name

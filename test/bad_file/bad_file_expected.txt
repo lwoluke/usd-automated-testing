@@ -1,4 +1,4 @@
-Runtime Error: in _RaiseErrorPEGTL at line 48 of /builds/omniverse/usd-ci/USD/pxr/usd/sdf/textParserHelpers.h -- /mnt/c/Users/lwolu/OneDrive/Documents/Coding/dev/usd-automated-testing/test/bad_file/bad_file.usda:13:9: Expected } at 'variants = {}' in </Root/VariantPrim>
+test/bad_file/bad_file.usda:13:9: Expected } at 'variants = {}' in </Root/VariantPrim>
 
-Runtime Error: in Open at line 1052 of /builds/omniverse/usd-ci/USD/pxr/usd/usd/stage.cpp -- Failed to open layer @/mnt/c/Users/lwolu/OneDrive/Documents/Coding/dev/usd-automated-testing/test/bad_file/bad_file.usda@
+test/bad_file/bad_file.usda@
 Failed to open USD file. Ensure the file path is correct and the file is accessible.

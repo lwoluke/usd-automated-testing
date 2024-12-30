@@ -6,3 +6,7 @@
 
 # Ignore the build folder
 /build/
+
+# Ignore agent jar and secret file
+/agent.jar
+/secret-file

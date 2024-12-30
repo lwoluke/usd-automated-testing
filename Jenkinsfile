@@ -1,6 +1,6 @@
 /**
  * USD Validation Pipeline
- * 
+ *
  * This Jenkins pipeline automates the build and testing process for the USD validation tool.
  * It supports both Windows and Linux environments, managing the build process, test execution,
  * and result reporting for USD file validation.
@@ -24,26 +24,40 @@ pipeline {
         label "${params.AGENT}"
     }
 
-    // Environment configuration for both Windows and Linux platforms
     environment {
         CMAKE_HOME = "${params.AGENT == 'windows_agent' ? 'C:\\Program Files\\CMake\\bin\\cmake.exe' : '/usr/bin/cmake'}"
         PYTHON_HOME = "${params.AGENT == 'windows_agent' ? 'C:\\Users\\lwolu\\AppData\\Local\\Programs\\Python\\Python310' : '/usr/bin/python3'}"
         USD_HOME = "${params.AGENT == 'windows_agent' ? 'C:\\Users\\lwolu\\OneDrive\\Documents\\Coding\\dev\\usd-automated-testing\\usd' : '/usr/local/USD'}"
         GIT_HOME = "${params.AGENT == 'windows_agent' ? 'C:\\Program Files\\Git\\bin\\git.exe' : '/usr/bin/git'}"
-        PATH = """${params.AGENT == 'windows_agent' \
-            ? env.PYTHON_HOME + ';' + env.PYTHON_HOME + '\\Scripts;C:\\Windows\\System32;' + env.PATH \
+        PATH = """${params.AGENT == 'windows_agent'
+            ? env.PYTHON_HOME + ';' + env.PYTHON_HOME + '\\Scripts;C:\\Windows\\System32;' + env.PATH
             : env.PATH}"""
     }
 
     stages {
-        // Validate build configuration and branch selection
+        // 1) Ensures a clean repository state by removing outdated .git metadata
+        stage('Cleanup') {
+            steps {
+                cleanWs()
+                script {
+                    if (params.AGENT == 'linux_agent') {
+                        sh 'rm -rf .git' // Linux
+                    } else {
+                        bat 'del /F /Q /S .git' // Windows
+                    }
+                }
+            }
+        }
+
+
+        // 2) Validate build configuration and branch selection
         stage('Determine Branch and Agent') {
             steps {
                 script {
                     if (params.AGENT != 'linux_agent' && params.AGENT != 'windows_agent') {
                         error "Unknown or misconfigured agent: ${params.AGENT}"
                     }
-                    
+
                     def actualBranch = params.BRANCH_NAME ?: env.BRANCH_NAME
                     if (!actualBranch) {
                         error "Branch name could not be determined. Provide a BRANCH_NAME parameter."
@@ -52,7 +66,7 @@ pipeline {
             }
         }
 
-        // Source code checkout stage
+        // 3) Checkout source
         stage('Checkout') {
             steps {
                 script {
@@ -65,7 +79,7 @@ pipeline {
             }
         }
 
-        // Validate required tools and environment
+        // 4) Validate required tools and environment
         stage('Environment Validation') {
             steps {
                 script {
@@ -94,7 +108,7 @@ pipeline {
             }
         }
 
-        // Build stage using CMake
+        // 5) Build with CMake
         stage('Build') {
             steps {
                 script {
@@ -115,52 +129,59 @@ pipeline {
             }
         }
 
-        // Execute USD validation tests
+        // 6) Execute USD validation tests
         stage('Test') {
             steps {
                 script {
                     def outputBaseDir = "test_results"
-                    
+
+                    // Create output directory
                     if (params.AGENT == 'windows_agent') {
                         bat "mkdir \"${outputBaseDir}\" 2>nul"
                     } else {
                         sh "mkdir -p ${outputBaseDir}"
                     }
 
+                    // Find *.usda test files
                     def testFiles = findFiles(glob: 'test/*/*.usda')
                     if (testFiles.length == 0) {
                         error "No test files found. Check the test directory structure."
                     }
 
-                    // Generate and execute test commands for each platform
-                    if (params.AGENT == 'windows_agent') {
-                        def testCommands = ""
-                        def comparisonCommands = ""
+                    // For each .usda file:
+                    testFiles.each { fileWrapper ->
+                        def normalizedPath = fileWrapper.path.replace('\\', '/')
+                        def subDir = normalizedPath.replaceFirst('test/', '').split('/')[0]
+                        def testFileName = normalizedPath.split('/').last().replace('.usda', '')
 
-                        testFiles.each { fileWrapper ->
-                            def normalizedPath = fileWrapper.path.replace('\\', '/')
-                            def subDir = normalizedPath.replaceFirst('test/', '').split('/')[0]
-                            def testFileName = normalizedPath.split('/').last().replace('.usda', '')
+                        if (params.AGENT == 'windows_agent') {
+                            // Windows: redirect both stdout (1) and stderr (2) into the same file
+                            bat """
+                            if not exist "${outputBaseDir}\\${subDir}" mkdir "${outputBaseDir}\\${subDir}"
+                            ".\\build\\usdTestRunner.exe" "${normalizedPath}" 1> "${outputBaseDir}\\${subDir}\\${testFileName}.txt" 2>&1
+                            """
+                            // Normalize path to "test/.../...usda"
+                            bat """
+                            powershell -Command "(Get-Content '${outputBaseDir}\\${subDir}\\${testFileName}.txt') \\
+                              -replace '(?i)([a-zA-Z0-9:_\\\\/.-]+test\\\\/${subDir}\\\\${testFileName}\\.usda)', 'test/${subDir}/${testFileName}.usda' \\
+                              | Out-File '${outputBaseDir}\\${subDir}\\${testFileName}.txt' -Encoding utf8"
+                            """
 
-                            testCommands += "if not exist \"${outputBaseDir}\\${subDir}\" mkdir \"${outputBaseDir}\\${subDir}\"\n"
-                            testCommands += "\".\\build\\usdTestRunner.exe\" \"${normalizedPath}\" > \"${outputBaseDir}\\${subDir}\\${testFileName}.txt\"\n"
-                            comparisonCommands += "fc /W \"test\\${subDir}\\${testFileName}_expected.txt\" \"${outputBaseDir}\\${subDir}\\${testFileName}.txt\"\n"
-                        }
+                            // Compare entire output to expected
+                            bat """
+                            fc /W "test\\${subDir}\\${testFileName}_expected.txt" "${outputBaseDir}\\${subDir}\\${testFileName}.txt"
+                            """
 
-                        writeFile file: 'run_tests.bat', text: testCommands
-                        writeFile file: 'compare_results.bat', text: comparisonCommands
-
-                        bat "run_tests.bat"
-                        bat "compare_results.bat"
-                    } else {
-                        testFiles.each { fileWrapper ->
-                            def normalizedPath = fileWrapper.path.replace('\\', '/')
-                            def subDir = normalizedPath.replaceFirst('test/', '').split('/')[0]
-                            def testFileName = normalizedPath.split('/').last().replace('.usda', '')
-
+                        } else {
+                            // Linux: redirect both stdout and stderr with 2>&1
                             sh """
                             mkdir -p ${outputBaseDir}/${subDir}
-                            ./build/usdTestRunner "${normalizedPath}" > "${outputBaseDir}/${subDir}/${testFileName}.txt"
+                            ./build/usdTestRunner "${normalizedPath}" > "${outputBaseDir}/${subDir}/${testFileName}.txt" 2>&1
+
+                            # Replace any absolute path that ends with test/${subDir}/${testFileName}.usda
+                            sed -i -E "s|(.*)test/${subDir}/${testFileName}\\.usda|test/${subDir}/${testFileName}.usda|g" "${outputBaseDir}/${subDir}/${testFileName}.txt"
+
+                            # Now compare
                             diff -w -B "test/${subDir}/${testFileName}_expected.txt" "${outputBaseDir}/${subDir}/${testFileName}.txt"
                             """
                         }
@@ -169,7 +190,7 @@ pipeline {
             }
         }
 
-        // Generate HTML test report
+        // 7) Generate HTML report
         stage('Report') {
             steps {
                 script {
@@ -192,7 +213,7 @@ pipeline {
                         echo "</ul></body></html>" >> reports/index.html
                         '''
                     }
-
+                    
                     publishHTML(target: [
                         allowMissing: false,
                         alwaysLinkToLastBuild: true,
@@ -206,7 +227,7 @@ pipeline {
         }
     }
 
-    // Post-build actions
+    // 8) Post-build actions
     post {
         always {
             archiveArtifacts artifacts: '**/test_results/**/*.txt', fingerprint: true
