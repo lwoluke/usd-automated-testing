@@ -1,5 +1,19 @@
 # USD Automated Testing
 
+## Table of Contents
+- [Overview](#overview)
+- [Prerequisites](#prerequisites)
+- [Setup Instructions](#setup-instructions)
+- [Continuous Integration Setup](#continuous-integration-setup)
+- [Usage](#usage)
+- [Example Output](#example-output)
+- [Acknowledgments](#acknowledgments)
+- [License](#license)
+- [Contributing](#contributing)
+- [Learn More](#learn-more)
+
+---
+
 ## Overview
 USD Automated Testing is a command-line utility for validating USD files. This tool ensures your USD assets comply with basic standards by checking the validity of:
 - Geometry (usdGeom)
@@ -88,7 +102,7 @@ java -jar agent.jar -url <your-ngrok-url> -secret @secret-file -name "windows_ag
 ---
 
 ## Usage
-The usdTestRunner utility validates USD files by checking for essential components like geometry and shaders.
+The `usdTestRunner` utility provides a fast and efficient way to validate USD files. Use it to ensure that your assets meet the necessary standards for geometry, shaders, layers, and variants.
 
 ### Running the Test Runner
 Examples of commands to run the test runner:
@@ -138,15 +152,30 @@ Congratulations, all tests were successful!
 ```
 ---
 
+## License
+This project is licensed under the same terms as [Pixar's OpenUSD License](LICENSE). It is independently developed and not affiliated with Pixar.
+
+---
+
 ## Contributing
-Contributions are welcome! Feel free to submit issues or pull requests to enhance the functionality. When contributing, ensure you follow the project's coding style. Submit PRs with detailed descriptions of changes.
+Contributions are welcome! Feel free to submit issues or pull requests to enhance the functionality. When contributing:
+- Follow the project's coding style.
+- Submit PRs with detailed descriptions of changes.
+- By contributing, you agree that your contributions will be licensed under the same terms as the project’s license.
 
 ---
 
 ## Acknowledgments
-- [Pixar Universal Scene Description](https://github.com/PixarAnimationStudios/USD)
+This project builds upon [Pixar's Universal Scene Description (USD)](https://github.com/PixarAnimationStudios/USD). It is independently developed and not affiliated with Pixar. Pixar’s contributions are greatly appreciated to the open-source community and the tools they provide.
 
 ---
 
 ## Learn More
-If you're interested in learning more about the development of USD Automated Testing, including tips and challenges faced during implementation, check out this [project part 1 blog post](https://luke-o.medium.com/c-automated-testing-framework-for-pixars-usd-50af70e58563), this [project part 2 blog post](https://luke-o.medium.com/extending-usd-automated-testing-with-jenkins-integration-002dcdec3786), and this [project part 3 blog post](https://luke-o.medium.com/usd-automated-testing-tool-functionality-expansion-33d23e06ea34).
+If you're interested in learning more about the development of USD Automated Testing, check out this blog series:
+- [Part 1: Introduction to the Framework](https://luke-o.medium.com/c-automated-testing-framework-for-pixars-usd-50af70e58563): Covers the initial development of the testing tool and its purpose.
+- [Part 2: Jenkins Integration](https://luke-o.medium.com/extending-usd-automated-testing-with-jenkins-integration-002dcdec3786): Explains how to set up continuous integration with Jenkins.
+- [Part 3: Expanding Functionality](https://luke-o.medium.com/usd-automated-testing-tool-functionality-expansion-33d23e06ea34): Details the addition of new features and enhancements.
+
+---
+
+Thank you for exploring USD Automated Testing. If you have any questions or suggestions, feel free to open an issue or reach out!
