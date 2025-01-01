@@ -79,7 +79,7 @@ While I have configured Jenkins locally for my setup, you'll need to set up your
    ```bash
    ngrok http --url=<your-ngrok-url> 8080
    ```
-   To access your free static url, go to the [Ngrok Setup Page](https://dashboard.ngrok.com/get-started/setup/windows)
+   To access your free static url, go to the [Ngrok Setup Page](https://dashboard.ngrok.com/get-started/setup/windows).
 
 ### Build Agent Configuration
 You'll need to run build agents on both Linux and Windows to enable Jenkins to execute builds on these platforms.
@@ -153,7 +153,7 @@ Congratulations, all tests were successful!
 ---
 
 ## License
-This project is licensed under the same terms as [Pixar's OpenUSD License](LICENSE). It is independently developed and not affiliated with Pixar.
+This project is licensed under the same terms as [Pixar's OpenUSD License](LICENSE.txt). It is independently developed and not affiliated with Pixar.
 
 ---
 
